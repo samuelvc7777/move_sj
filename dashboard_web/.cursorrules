@@ -1,0 +1,58 @@
+# Regras de Arquitetura e Engenharia: MoveSJ Dashboard (Next.js)
+
+Este arquivo define as regras estritas de arquitetura e organização de pastas para o projeto `dashboard_web`. O objetivo é manter um padrão escalável ("Feature-Sliced Design") focado no domínio da aplicação de mobilidade.
+
+## 1. Estrutura de Pastas Obrigatória
+
+Todo novo código deve ser organizado primariamente por **Contexto de Negócio (Feature)** e não por tipo técnico de arquivo.
+
+A pasta `src/` DEVE ser estruturada assim:
+
+- `src/app/`: Exclusivo para o App Router do Next.js (páginas, layouts, rotas de API, middlewares). NENHUMA lógica de negócio complexa deve ficar aqui. As páginas devem apenas "montar" componentes vindos de `features` ou `shared`.
+- `src/features/`: Onde a verdadeira aplicação vive. Agrupamento por domínio.
+  - Exemplo: `src/features/rides/`, `src/features/drivers/`, `src/features/passengers/`, `src/features/finance/`.
+  - Cada "feature" deve conter suas próprias subpastas técnicas quando necessário: `components/`, `hooks/`, `services/`, `utils/`, `types/`.
+- `src/shared/`: Código que é genuinamente compartilhado por VÁRIAS features.
+  - `shared/components/`: O Design System (Botões, Inputs, Modais base, Spinners).
+  - `shared/lib/`: Configurações de bibliotecas externas (ex: `supabase.ts`, `axios.ts`).
+  - `shared/utils/`: Funções utilitárias puras (formatadores de data, moeda, cn pro tailwind).
+  - `shared/hooks/`: Hooks React genéricos (`useWindowSize`, `useLocalStorage`).
+- `src/config/`: Constantes globais, navegação, variáveis de ambiente validadas.
+
+## 2. Regras de Importação (Dependency Rule)
+
+Para manter a sanidade do projeto e evitar acoplamento circular, siga estas regras ao importar arquivos:
+
+✅ **Páginas (`src/app/`)** PODEM importar de `features`, `shared` e `config`.
+✅ **Features (`src/features/X/`)** PODEM importar de seu PRÓPRIO contexto interno, de `shared` e de `config`.
+❌ **Features (`src/features/X/`) NUNCA** devem importar de outra feature (`src/features/Y/`). Se duas features precisam compartilhar algo, esse código deve ser promovido para `src/shared/`.
+❌ **Shared (`src/shared/`) NUNCA** deve importar de `app` ou `features`. O Shared é a camada mais "baixa" e burra; ele não sabe sobre a regra de negócio.
+
+## 3. Integração com Banco de Dados (Supabase)
+
+- A instância do cliente Supabase deve ser iniciada UMA VEZ em `src/shared/lib/supabase/client.ts`.
+- Lógicas de acesso a dados (APIs) devem ficar dentro das respectivas features, em `services/`. Exemplo: `src/features/rides/services/ridesApi.ts`.
+- Evite buscar dados diretamente dentro de componentes visuais sempre que possível. Utilize funções de serviço bem tipadas e prefira React Server Components (RSCs) dentro do `src/app/` para busca inicial de dados, repassando para os Client Components.
+
+## 4. Tipagem (TypeScript)
+
+- TUDO deve ser estritamente tipado. Evite `any` a todo custo.
+- Tipos de domínio abstratos gerais podem ir para `src/shared/types/`.
+- Tipos específicos de uma feature devem ficar junto da feature (ex: `src/features/drivers/types/index.ts`).
+- Se houver integração de banco, os tipos base devem ser extraídos da base de dados (Ex: tipos gerados pelo CLI do Supabase).
+
+## 5. UI e Estilização (Tailwind CSS)
+
+- Utilizamos Tailwind CSS. Mantenha os estilos inline o mais modulares possível.
+- Ao componentizar elementos do Design System (em `shared/components`), utilize a biblioteca `clsx` e `tailwind-merge` (frequentemente agrupadas numa função `cn()`) para compor classes e permitir sobreposições seguras de classes via `className` props.
+
+## Resumo prático na criação de arquivos
+
+Se precisar criar um botão verde padrão:
+👉 `src/shared/components/ui/Button.tsx`
+
+Se precisar criar o painel do mapa da corrida em andamento:
+👉 `src/features/rides/components/LiveRouteMap.tsx`
+
+Se precisar criar a página para acessar o painel de corridas:
+👉 `src/app/(dashboard)/corridas/page.tsx` (que fará `import { LiveRouteMap } from '@/features/rides/components/LiveRouteMap'`)
