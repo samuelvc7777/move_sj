@@ -1,4 +1,4 @@
-// 1. IMPORTAÇÕES DE MÓDULOS DE NEGÓCIO (Nossas Features)
+﻿// 1. IMPORTAÇÕES DE MÓDULOS DE NEGÓCIO (Nossas Features)
 // Perceba que esta página está extremamente "limpa". Ela não tem milhares de linhas desenhando quadrados e botões.
 // Ao invés disso, ela age apenas como um "Montador de Peças de Lego".
 // Importamos os componentes que construímos na pasta `src/features/dashboard/...`
@@ -20,16 +20,16 @@ export default function DashboardHome() {
       {/* flex-col no mobile, flex-row em telas maiores que (sm) para alinhar os elementos lado a lado. */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Visão Geral</h1>
-          <p className="text-gray-500 mt-1">Acompanhe as métricas do MoveSJ em tempo real.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Visão Geral</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Acompanhe as métricas do MoveSJ em tempo real.</p>
         </div>
 
         {/* Futuros botões para exportar dados para relatórios em PDF/CSV */}
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm">
+          <button className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
             Exportar
           </button>
-          <button className="px-4 py-2 bg-indigo-600 border border-transparent text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+          <button className="px-4 py-2 bg-blue-600 border border-transparent text-white rounded-lg text-sm font-medium hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors shadow-sm">
             Gerar Relatório
           </button>
         </div>
